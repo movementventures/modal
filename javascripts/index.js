@@ -33,7 +33,7 @@ exports = module.exports = modal;
  * Define sl-modal directive.
  */
 
-exports.directive('slModal', function($parse) {
+exports.directive('slModal', function($rootScope, $parse) {
   return {
     restrict: 'A',
     link: function(scope, element, attr) {
@@ -68,12 +68,13 @@ exports.directive('slModal', function($parse) {
           setTimeout(function () {
             scope.slModalShowing = true;
             scope.$digest();
+            $rootScope.$broadcast('modal:show');
           }, delayShowHide);
           return
         }
-
         container.className = active + ' active';  
         scope.slModalShowing = true;
+        $rootScope.$broadcast('modal:show');
         try {
           scope.$digest();
         } catch (e){}
@@ -86,11 +87,13 @@ exports.directive('slModal', function($parse) {
           setTimeout(function () {
             container.className = active;
             scope.$digest();
+            $rootScope.$broadcast('modal:hide');
           }, 250);
           return
         }
         container.className = active;
         scope.slModalShowing = false;
+        $rootScope.$broadcast('modal:hide');
         try {
           scope.$digest();
         } catch (e){}
