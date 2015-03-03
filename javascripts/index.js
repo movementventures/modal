@@ -33,78 +33,82 @@ exports = module.exports = modal;
  * Define sl-modal directive.
  */
 
-exports.directive('slModal', function($rootScope, $parse) {
-  return {
-    restrict: 'A',
-    link: function(scope, element, attr) {
-      var active = 'sl-modal-container'
+exports.directive('slModal', [
+  '$rootScope',
+  '$parse', 
+  function($rootScope, $parse) {
+    return {
+      restrict: 'A',
+      link: function(scope, element, attr) {
+        var active = 'sl-modal-container'
 
-      var content = element.next();
-      content.remove();
-      content = content[0];
-      content.className += ' sl-modal';
+        var content = element.next();
+        content.remove();
+        content = content[0];
+        content.className += ' sl-modal';
 
-      var container = document.createElement('div');
-      container.className = active;
-      container.appendChild(content);
-
-      var bg = document.createElement('div');
-      bg.className = 'bg';
-      bg.onclick = close;
-      container.appendChild(bg);
-
-      var link = element;
-      link.attr('href', 'javascript:;');
-      link.bind('click', open);
-
-      var delayShowHide = attr.delayShowHide;
-
-      modalGroup.appendChild(container);
-
-      scope.open = open;
-      function open() {
-        if (delayShowHide) {
-          container.className = active + ' active';  
-          setTimeout(function () {
-            scope.slModalShowing = true;
-            scope.$digest();
-            $rootScope.$broadcast('modal:show');
-          }, delayShowHide);
-          return
-        }
-        container.className = active + ' active';  
-        scope.slModalShowing = true;
-        $rootScope.$broadcast('modal:show');
-        try {
-          scope.$digest();
-        } catch (e){}
-      }
-
-      scope.close = close;
-      function close() {
-        if (delayShowHide) {
-          scope.slModalShowing = false;
-          setTimeout(function () {
-            container.className = active;
-            scope.$digest();
-            $rootScope.$broadcast('modal:hide');
-          }, 250);
-          return
-        }
+        var container = document.createElement('div');
         container.className = active;
-        scope.slModalShowing = false;
-        $rootScope.$broadcast('modal:hide');
-        try {
-          scope.$digest();
-        } catch (e){}
+        container.appendChild(content);
+
+        var bg = document.createElement('div');
+        bg.className = 'bg';
+        bg.onclick = close;
+        container.appendChild(bg);
+
+        var link = element;
+        link.attr('href', 'javascript:;');
+        link.bind('click', open);
+
+        var delayShowHide = attr.delayShowHide;
+
+        modalGroup.appendChild(container);
+
+        scope.open = open;
+        function open() {
+          if (delayShowHide) {
+            container.className = active + ' active';  
+            setTimeout(function () {
+              scope.slModalShowing = true;
+              scope.$digest();
+              $rootScope.$broadcast('modal:show');
+            }, delayShowHide);
+            return
+          }
+          container.className = active + ' active';  
+          scope.slModalShowing = true;
+          $rootScope.$broadcast('modal:show');
+          try {
+            scope.$digest();
+          } catch (e){}
+        }
+
+        scope.close = close;
+        function close() {
+          if (delayShowHide) {
+            scope.slModalShowing = false;
+            setTimeout(function () {
+              container.className = active;
+              scope.$digest();
+              $rootScope.$broadcast('modal:hide');
+            }, 250);
+            return
+          }
+          container.className = active;
+          scope.slModalShowing = false;
+          $rootScope.$broadcast('modal:hide');
+          try {
+            scope.$digest();
+          } catch (e){}
+        }
+
+        escape(close);
+
+        scope.$on('$destroy', function() {
+          modalGroup.removeChild(container);
+        });
+
       }
-
-      escape(close);
-
-      scope.$on('$destroy', function() {
-        modalGroup.removeChild(container);
-      });
-
-    }
-  };
-});
+    };
+  }
+]);
